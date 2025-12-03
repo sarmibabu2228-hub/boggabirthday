@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday My Dhana</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(to top, #001018, #000000 60%);
+        color: #fff;
+    }
+
+    /* Night pond + tree background */
+    .background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("https://i.ibb.co/5Fw0c5X/night-pond.jpg");
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.6);
+        z-index: 0;
+    }
+
+    /* Moon */
+    .moon {
+        position: fixed;
+        top: 60px;
+        right: 120px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, #fff, #dcdcdc);
+        border-radius: 50%;
+        box-shadow: 0 0 40px 20px #fff;
+        animation: glow 4s ease-in-out infinite alternate;
+        z-index: 1;
+    }
+
+    @keyframes glow {
+        from { box-shadow: 0 0 20px 10px #fff; }
+        to { box-shadow: 0 0 40px 25px #e6e6e6; }
+    }
+
+    /* Parrots */
+    .parrots {
+        position: fixed;
+        right: 250px;
+        top: 200px;
+        width: 180px;
+        z-index: 2;
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Message Box */
+    .message-box {
+        position: relative;
+        z-index: 5;
+        max-width: 900px;
+        margin: 180px auto;
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.55);
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+        text-align: center;
+        animation: fadeIn 3s ease-in-out;
+        font-size: 1.3em;
+        line-height: 1.6em;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Fireworks canvas */
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 3;
+        pointer-events: none;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+<div class="moon"></div>
+
+<!-- parrots PNG -->
+<img src="https://i.ibb.co/DYwJH0v/parrots.png" class="parrots">
+
+<!-- Fireworks -->
+<canvas id="fireworksCanvas"></canvas>
+
+<div class="message-box">
+    <p>Happy birthday to my dhana! I hope you will be very happy today and also with me ❤</p>
+    <p>My love, I always pray to God that my sweetheart will be so happy for hundreds of years with me. My cutie, I'm so blessed that I got you in this big world.</p>
+    <p>I promise you that I will keep you happy more and more every day. My love for you is infinite, my cutie sonaa motkiiii 💋😘🐼</p>
+    <p>My gelu pila suna pandu, love you so much my hati! You always take care of me like a kid, and it's the best feeling ever.</p>
+    <p>This is a small surprise for you. I hope you like it, my baby. Be mine forever 💖</p>
+</div>
+
+<script>
+/* -----------------------------
+   FIREWORKS ANIMATION SCRIPT
+--------------------------------*/
+const canvas = document.getElementById("fireworksCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.onresize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+};
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+class Firework {
+    constructor() {
+        this.x = random(0, canvas.width);
+        this.y = canvas.height;
+        this.targetY = random(canvas.height * 0.1, canvas.height * 0.5);
+        this.speed = random(4, 6);
+        this.color = `hsl(${random(0, 360)}, 100%, 60%)`;
+        this.exploded = false;
+        this.particles = [];
+    }
+
+    update() {
+        if (!this.exploded) {
+            this.y -= this.speed;
+            if (this.y <= this.targetY) {
+                this.explode();
+            }
+        } else {
+            this.particles.forEach(p => p.update());
+        }
+    }
+
+    explode() {
+        this.exploded = true;
+        for (let i = 0; i < 50; i++) {
+            this.particles.push(new Particle(this.x, this.y, this.color));
+        }
+    }
+
+    draw() {
+        if (!this.exploded) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        } else {
+            this.particles.forEach(p => p.draw());
+        }
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.speed = random(2, 5);
+        this.angle = random(0, Math.PI * 2);
+        this.color = color;
+        this.alpha = 1;
+    }
+
+    update() {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        this.alpha -= 0.02;
+    }
+
+    draw() {
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+let fireworks = [];
+
+function animate() {
+    requestAnimationFrame(animate);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (Math.random() < 0.05) {
+        fireworks.push(new Firework());
+    }
+
+    fireworks.forEach(f => f.update());
+    fireworks.forEach(f => f.draw());
+}
+
+animate();
+</script>
+
+</body>
+</html>
